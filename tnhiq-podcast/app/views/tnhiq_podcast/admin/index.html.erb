@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Podcast Engine — TNHIQ Admin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; max-width: 1100px; margin: 1rem auto; padding: 1rem; line-height: 1.5; color: #222; }
+    h1 { font-size: 1.5rem; margin-bottom: .25rem; }
+    .lead { color: #666; margin-bottom: 1rem; }
+    .config { padding: .75rem 1rem; background: #f5f5f5; border-radius: 6px; margin-bottom: 1rem; font-size: .9rem; }
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; margin-top: 1rem; }
+    th, td { padding: .5rem .75rem; border-bottom: 1px solid #eee; text-align: left; vertical-align: top; }
+    th { background: #fafafa; font-weight: 600; }
+    code { background: #f5f5f5; padding: .1rem .4rem; border-radius: 3px; font-size: .85rem; }
+    .empty { padding: 2rem; text-align: center; color: #888; }
+    a { color: #25aae2; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>Podcast Engine</h1>
+  <p class="lead">RSS-driven episode ingestion to community threads.</p>
+
+  <div class="config">
+    <strong>RSS URL:</strong> <%= @rss_url.present? ? @rss_url : "<em>not configured — set tnhiq_podcast_rss_url</em>".html_safe %><br>
+    <strong>Default category:</strong> <code><%= SiteSetting.tnhiq_podcast_default_category %></code> ·
+    <strong>Pin days:</strong> <%= SiteSetting.tnhiq_podcast_pin_days %> ·
+    <strong>Max per poll:</strong> <%= SiteSetting.tnhiq_podcast_max_per_poll %>
+  </div>
+
+  <p>
+    POST to <code>/admin/plugins/tnhiq-podcast/poll-now</code> to trigger an immediate poll.<br>
+    POST to <code>/admin/plugins/tnhiq-podcast/ingest-one</code> with a JSON body to ingest a single episode for testing.
+  </p>
+
+  <h2 style="margin-top:1.5rem;font-size:1.15rem">Recently ingested</h2>
+
+  <% if @episodes.empty? %>
+    <div class="empty">No episodes ingested yet.</div>
+  <% else %>
+    <table>
+      <thead>
+        <tr>
+          <th>Ingested</th>
+          <th>Episode</th>
+          <th>Title</th>
+          <th>Topic</th>
+          <th>Category</th>
+          <th>GUID</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @episodes.each do |ep| %>
+          <tr>
+            <td><%= ep.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+            <td><%= ep.episode_number.presence || "—" %></td>
+            <td><%= ep.title %></td>
+            <td>
+              <% if ep.topic_id %>
+                <a href="/t/<%= ep.topic_id %>" target="_blank">#<%= ep.topic_id %></a>
+              <% else %>—<% end %>
+            </td>
+            <td><code><%= ep.category_id %></code></td>
+            <td><code><%= ep.guid.truncate(40) %></code></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+</body>
+</html>

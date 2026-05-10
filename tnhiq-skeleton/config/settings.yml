@@ -1,0 +1,4 @@
+plugins:
+  tnhiq_skeleton_enabled:
+    default: true
+    client: true

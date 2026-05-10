@@ -1,0 +1,20 @@
+plugins:
+  tnhiq_podcast_enabled:
+    default: true
+    client: true
+  tnhiq_podcast_rss_url:
+    default: ""
+    client: false
+  tnhiq_podcast_default_category:
+    default: "announcements"
+    client: false
+  tnhiq_podcast_pin_days:
+    default: 7
+    min: 0
+    max: 90
+    client: false
+  tnhiq_podcast_max_per_poll:
+    default: 5
+    min: 1
+    max: 50
+    client: false

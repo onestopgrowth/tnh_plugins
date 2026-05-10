@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="<%= form_authenticity_token %>">
+  <title><%= @opportunity.title %> — Opportunity</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; max-width: 720px; margin: 1.5rem auto; padding: 1rem; line-height: 1.6; color: #222; }
+    h1 { font-size: 1.5rem; margin-bottom: .25rem; }
+    .meta { color: #666; font-size: .9rem; margin-bottom: 1rem; }
+    .badge { display: inline-block; padding: .15rem .55rem; border-radius: 3px; font-size: .8rem; font-weight: 600; margin-right: .25rem; }
+    .badge.tier-free { background: #e0f3ff; color: #0066aa; }
+    .badge.tier-core { background: #fff3e0; color: #aa5500; }
+    .badge.tier-premium { background: #f0e6ff; color: #5500aa; }
+    .badge.tier-founder { background: #ffe0e6; color: #aa0033; }
+    .badge.verified { background: #e0ffe0; color: #007700; }
+    .desc { white-space: pre-wrap; padding: 1rem; background: #fafafa; border: 1px solid #eee; border-radius: 6px; margin: 1rem 0; }
+    .actions { display: flex; gap: .5rem; align-items: center; margin-top: 1rem; }
+    button { padding: .65rem 1.25rem; background: #25aae2; color: white; border: 0; border-radius: 6px; cursor: pointer; font-size: .95rem; font-weight: 500; }
+    button[disabled] { opacity: .5; cursor: not-allowed; }
+    button.withdraw { background: transparent; color: #aa0033; border: 1px solid #aa0033; }
+    .verified-warning { padding: .75rem 1rem; background: #fff3e0; border: 1px solid #f0c060; border-radius: 6px; margin: 1rem 0; color: #774400; }
+    a.back { display: inline-block; color: #25aae2; text-decoration: none; margin-bottom: 1rem; }
+    .status-msg { margin-top: .75rem; color: #666; }
+  </style>
+</head>
+<body>
+  <a class="back" href="/opportunities">← All opportunities</a>
+
+  <h1><%= @opportunity.title %></h1>
+
+  <div class="meta">
+    <span class="badge tier-<%= @opportunity.tier_required %>"><%= @opportunity.tier_required.titleize %></span>
+    <% if @opportunity.requires_verified %><span class="badge verified">Verified only</span><% end %>
+    <%= @opportunity.source_label.presence || @opportunity.source_type.titleize %>
+    <% if @opportunity.expires_at.present? %> · expires <%= @opportunity.expires_at.strftime("%B %d, %Y") %><% end %>
+    · <%= @opportunity.interest_count %> interested
+  </div>
+
+  <table style="margin-bottom:1rem">
+    <% if @opportunity.equipment_type.present? %><tr><td><strong>Equipment</strong></td><td style="padding-left:1rem"><%= @opportunity.equipment_type.titleize %></td></tr><% end %>
+    <% if @opportunity.origin_state.present? %><tr><td><strong>Origin</strong></td><td style="padding-left:1rem"><%= @opportunity.origin_state %></td></tr><% end %>
+    <% if @opportunity.destination_state.present? %><tr><td><strong>Destination</strong></td><td style="padding-left:1rem"><%= @opportunity.destination_state %></td></tr><% end %>
+    <% if @opportunity.commodity.present? %><tr><td><strong>Commodity</strong></td><td style="padding-left:1rem"><%= @opportunity.commodity %></td></tr><% end %>
+  </table>
+
+  <% if @opportunity.description.present? %>
+    <div class="desc"><%= @opportunity.description %></div>
+  <% end %>
+
+  <% if @opportunity.requires_verified && !@verified %>
+    <div class="verified-warning">
+      <strong>Verification required.</strong> This opportunity is reserved for IQDID-verified carriers.
+      Verify your carrier identity from your profile to claim it.
+    </div>
+  <% end %>
+
+  <div class="actions">
+    <% if @already_interested %>
+      <button type="button" class="withdraw" id="withdraw-btn">Withdraw interest</button>
+      <span class="status-msg" id="status">You've registered interest in this opportunity.</span>
+    <% else %>
+      <button type="button" id="interest-btn"
+              <%= "disabled" if @opportunity.requires_verified && !@verified %>>
+        I'm Interested
+      </button>
+      <span class="status-msg" id="status"></span>
+    <% end %>
+  </div>
+
+  <script>
+    (function() {
+      const csrf = document.querySelector('meta[name="csrf-token"]').content;
+      const status = document.getElementById('status');
+
+      const interestBtn = document.getElementById('interest-btn');
+      if (interestBtn) {
+        interestBtn.addEventListener('click', async () => {
+          interestBtn.disabled = true;
+          interestBtn.textContent = 'Saving…';
+          try {
+            const res = await fetch('/opportunities/<%= @opportunity.id %>/interest', {
+              method: 'POST',
+              credentials: 'same-origin',
+              headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf },
+              body: JSON.stringify({}),
+            });
+            const json = await res.json();
+            if (res.ok && json.ok) {
+              status.textContent = 'Interest registered. Reloading…';
+              setTimeout(() => window.location.reload(), 600);
+            } else {
+              status.textContent = 'Failed: ' + (json.error || (json.errors || []).join(', '));
+              interestBtn.disabled = false;
+              interestBtn.textContent = "I'm Interested";
+            }
+          } catch (err) {
+            status.textContent = 'Network error.';
+            interestBtn.disabled = false;
+            interestBtn.textContent = "I'm Interested";
+          }
+        });
+      }
+
+      const withdrawBtn = document.getElementById('withdraw-btn');
+      if (withdrawBtn) {
+        withdrawBtn.addEventListener('click', async () => {
+          withdrawBtn.disabled = true;
+          try {
+            const res = await fetch('/opportunities/<%= @opportunity.id %>/interest', {
+              method: 'DELETE',
+              credentials: 'same-origin',
+              headers: { 'X-CSRF-Token': csrf },
+            });
+            if (res.ok) {
+              window.location.reload();
+            } else {
+              status.textContent = 'Withdraw failed.';
+              withdrawBtn.disabled = false;
+            }
+          } catch (err) {
+            status.textContent = 'Network error.';
+            withdrawBtn.disabled = false;
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sponsor Placements — TNHIQ Admin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; max-width: 1100px; margin: 1rem auto; padding: 1rem; line-height: 1.5; color: #222; }
+    h1 { font-size: 1.5rem; margin-bottom: .25rem; }
+    .lead { color: #666; margin-bottom: 1rem; }
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    th, td { padding: .5rem .75rem; border-bottom: 1px solid #eee; text-align: left; vertical-align: top; }
+    th { background: #fafafa; font-weight: 600; }
+    .badge { display: inline-block; padding: .1rem .5rem; border-radius: 3px; font-size: .75rem; font-weight: 600; }
+    .badge.on  { background: #e0ffe0; color: #007700; }
+    .badge.off { background: #ffe0e0; color: #aa0000; }
+    .empty { padding: 2rem; text-align: center; color: #888; }
+    code { background: #f5f5f5; padding: .1rem .4rem; border-radius: 3px; font-size: .85rem; }
+  </style>
+</head>
+<body>
+  <h1>Sponsor Placements</h1>
+  <p class="lead">
+    <%= @placements.size %> placement<%= "s" if @placements.size != 1 %>.
+    Manage via the JSON endpoints under <code>/admin/plugins/tnhiq-sponsors</code>.
+  </p>
+
+  <% if @placements.empty? %>
+    <div class="empty">No placements yet. POST to <code>/admin/plugins/tnhiq-sponsors</code> to create one.</div>
+  <% else %>
+    <table>
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Slot</th>
+          <th>Sponsor</th>
+          <th>Targeting</th>
+          <th>Date range</th>
+          <th>Clicks</th>
+          <th>ID</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @placements.each do |p| %>
+          <tr>
+            <td>
+              <% if p.active %>
+                <span class="badge on">ON</span>
+              <% else %>
+                <span class="badge off">OFF</span>
+              <% end %>
+            </td>
+            <td><code><%= p.slot %></code></td>
+            <td>
+              <strong><%= p.sponsor_name %></strong><br>
+              <a href="<%= p.sponsor_link %>" rel="noopener" target="_blank"><%= p.sponsor_link.truncate(60) %></a>
+              <% if p.cta_text.present? %><br><em>"<%= p.cta_text %>"</em><% end %>
+            </td>
+            <td>
+              <% if p.target_niche.present? %>niche=<code><%= p.target_niche %></code><br><% end %>
+              <% if p.target_group_id.present? %>group_id=<code><%= p.target_group_id %></code><br><% end %>
+              <% if p.category_id.present? %>category_id=<code><%= p.category_id %></code><br><% end %>
+              <% if p.target_niche.blank? && p.target_group_id.blank? && p.category_id.blank? %>
+                <em>everyone</em>
+              <% end %>
+            </td>
+            <td>
+              <% if p.starts_at %><%= p.starts_at.strftime("%Y-%m-%d") %><% else %>—<% end %>
+              →
+              <% if p.ends_at %><%= p.ends_at.strftime("%Y-%m-%d") %><% else %>—<% end %>
+            </td>
+            <td><strong><%= p.click_count %></strong></td>
+            <td><code><%= p.id %></code></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+</body>
+</html>

@@ -1,0 +1,13 @@
+plugins:
+  tnhiq_opportunities_enabled:
+    default: true
+    client: true
+  tnhiq_opportunities_ingest_secret:
+    default: ""
+    client: false
+    secret: true
+  tnhiq_opportunities_default_page_size:
+    default: 25
+    min: 1
+    max: 100
+    client: true

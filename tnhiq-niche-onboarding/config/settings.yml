@@ -1,0 +1,12 @@
+plugins:
+  tnhiq_niche_onboarding_enabled:
+    default: true
+    client: true
+  tnhiq_niche_onboarding_crm_url:
+    default: "https://tnh-comm-api.onrender.com"
+    client: false
+  tnhiq_niche_onboarding_crm_timeout_seconds:
+    default: 10
+    min: 1
+    max: 60
+    client: false
