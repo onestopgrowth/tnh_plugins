@@ -53,6 +53,10 @@ module ::TnhiqOnboarding
 
       ::TnhiqOnboarding::Segmenter.apply!(current_user, answers, path_key)
 
+      # Sync the completed intake to the backend Member Intelligence Database
+      # (async, best-effort). Discourse keeps custom fields only as a mirror.
+      ::TnhiqOnboarding::BackendSync.enqueue(current_user.id)
+
       render json: { ok: true, path: path_key, redirect_url: "/founders/onboarding/result" }
     end
 

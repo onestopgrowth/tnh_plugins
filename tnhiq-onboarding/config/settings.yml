@@ -14,6 +14,14 @@ plugins:
   tnhiq_onboarding_assign_path_groups:
     default: true
     client: false
+  # Backend Member Intelligence Database — where completed intake is synced.
+  tnhiq_onboarding_backend_url:
+    default: "https://api.tnhiq.com"
+    client: false
+  tnhiq_onboarding_backend_secret:
+    default: ""
+    client: false
+    secret: true
   # Destinations shown on the result page (relative paths or full URLs).
   tnhiq_onboarding_intro_topic_url:
     default: "/c/introductions"

@@ -21,11 +21,14 @@ after_initialize do
   register_user_custom_field_type("tnhiq_goal_90_day", :string)
   register_user_custom_field_type("tnhiq_help_wanted", :json)
   register_user_custom_field_type("tnhiq_path", :string)
+  register_user_custom_field_type("tnhiq_synced_at", :string)
+  register_user_custom_field_type("tnhiq_sync_error", :string)
 
   require_relative "lib/tnhiq_onboarding/answers"
   require_relative "lib/tnhiq_onboarding/paths"
   require_relative "lib/tnhiq_onboarding/path_assigner"
   require_relative "lib/tnhiq_onboarding/segmenter"
+  require_relative "lib/tnhiq_onboarding/backend_sync"
   require_relative "app/controllers/tnhiq_onboarding/onboarding_controller"
   require_relative "app/controllers/tnhiq_onboarding/admin_report_controller"
 
