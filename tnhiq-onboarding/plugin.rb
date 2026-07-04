@@ -8,18 +8,20 @@
 
 enabled_site_setting :tnhiq_onboarding_enabled
 
-# ── User custom fields (all answers live on the user profile) ──────────
-# Multi-selects are stored as JSON; single answers as strings.
-register_user_custom_field_type("tnhiq_onboarding_completed_at", :string)
-register_user_custom_field_type("tnhiq_stage", :string)
-register_user_custom_field_type("tnhiq_interests", :json)
-register_user_custom_field_type("tnhiq_pain_point", :string)
-register_user_custom_field_type("tnhiq_resources", :json)
-register_user_custom_field_type("tnhiq_goal_90_day", :string)
-register_user_custom_field_type("tnhiq_help_wanted", :json)
-register_user_custom_field_type("tnhiq_path", :string)
-
 after_initialize do
+  # User custom fields (all answers live on the user profile). Registered here
+  # rather than at the top level so the User model is loaded — registering at
+  # load time breaks `rake db:migrate` (uninitialized constant User).
+  # Multi-selects are stored as JSON; single answers as strings.
+  register_user_custom_field_type("tnhiq_onboarding_completed_at", :string)
+  register_user_custom_field_type("tnhiq_stage", :string)
+  register_user_custom_field_type("tnhiq_interests", :json)
+  register_user_custom_field_type("tnhiq_pain_point", :string)
+  register_user_custom_field_type("tnhiq_resources", :json)
+  register_user_custom_field_type("tnhiq_goal_90_day", :string)
+  register_user_custom_field_type("tnhiq_help_wanted", :json)
+  register_user_custom_field_type("tnhiq_path", :string)
+
   require_relative "lib/tnhiq_onboarding/answers"
   require_relative "lib/tnhiq_onboarding/paths"
   require_relative "lib/tnhiq_onboarding/path_assigner"
