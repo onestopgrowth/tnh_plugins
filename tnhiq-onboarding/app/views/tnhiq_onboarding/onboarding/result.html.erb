@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Starting Path — Truck N' Hustle Founder's Circle</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0f1e; color: #e8ecf3; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; }
+    .wrap { width: 100%; max-width: 640px; }
+    .kicker { color: #F2142F; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+    h1 { font-size: 30px; margin: 8px 0 20px; }
+    .card { background: #111827; border: 1px solid #223; border-radius: 14px; padding: 26px; }
+    .card p { margin-bottom: 12px; }
+    .muted { color: #8b97b4; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+    a.btn { padding: 12px 20px; border-radius: 999px; font-size: 15px; font-weight: 600; text-decoration: none; display: inline-block; }
+    .btn-red { background: #F2142F; color: #fff; }
+    .btn-navy { background: #101E43; color: #fff; }
+    .btn-ghost { background: transparent; color: #b7c0d6; border: 1px solid #26304d; }
+    .steps { color: #8b97b4; font-size: 13px; margin-top: 18px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="kicker">Your starting path is ready</div>
+    <h1><%= @path[:name] %></h1>
+    <div class="card">
+      <p><%= @path[:body] %></p>
+      <p><strong>Recommended room:</strong> <%= @path[:room_name] %></p>
+      <p><strong>Your first action:</strong> <%= @path[:first_action] %></p>
+    </div>
+
+    <div class="actions">
+      <a class="btn btn-red" id="intro-btn" href="<%= SiteSetting.tnhiq_onboarding_intro_topic_url %>">Introduce Myself</a>
+      <a class="btn btn-navy" href="<%= SiteSetting.tnhiq_onboarding_roundtable_topic_url %>">RSVP for the Roundtable</a>
+      <a class="btn btn-ghost" href="/c/<%= @path[:room_slug] %>">Go to My Room</a>
+    </div>
+    <p class="steps">1. Introduce yourself · 2. Join your room · 3. RSVP for the Founding Members Roundtable · 4. Post your first question</p>
+    <p class="steps"><a class="muted" href="<%= SiteSetting.tnhiq_onboarding_start_here_url %>">Start Here →</a></p>
+  </div>
+
+  <script>
+  (function () {
+    // Prefill the intro composer with the structured template.
+    var goal = <%= raw((current_user.custom_fields["tnhiq_goal_90_day"] || "").to_json) %>;
+    var body = [
+      'Name:', 'City / State:', 'Current stage:', "What I'm building or exploring:",
+      'Experience level:', 'My next 90-day goal: ' + goal, 'Biggest challenge right now:',
+      'What I need help with:', 'One thing I may be able to help others with:'
+    ].join('\n');
+    var introBtn = document.getElementById('intro-btn');
+    introBtn.setAttribute('href',
+      '/new-topic?category=introductions&title=' + encodeURIComponent('[Member Intro]') +
+      '&body=' + encodeURIComponent(body));
+  })();
+  </script>
+</body>
+</html>

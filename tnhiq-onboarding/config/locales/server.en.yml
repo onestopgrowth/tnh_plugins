@@ -1,0 +1,15 @@
+en:
+  site_settings:
+    tnhiq_onboarding_enabled: "Enable the Founder's Circle onboarding flow."
+    tnhiq_onboarding_founding_group: "Members of this group are prompted to complete onboarding on first login."
+    tnhiq_onboarding_required: "If enabled, members who haven't completed onboarding are redirected into it; otherwise it is skippable."
+    tnhiq_onboarding_assign_path_groups: "Add the member to their assigned path group when they finish onboarding."
+    tnhiq_onboarding_intro_topic_url: "Where the 'Introduce Myself' action links (category or topic)."
+    tnhiq_onboarding_roundtable_topic_url: "Where the 'RSVP for the Roundtable' action links."
+    tnhiq_onboarding_start_here_url: "Start Here destination shown on the result page."
+    tnhiq_onboarding_group_beginner_explorer: "Group for the Beginner Explorer path (max 20 chars)."
+    tnhiq_onboarding_group_driver_owner_operator: "Group for the Driver / Owner-Operator path (max 20 chars)."
+    tnhiq_onboarding_group_small_fleet_builder: "Group for the Small Fleet Builder path (max 20 chars)."
+    tnhiq_onboarding_group_non_asset_builder: "Group for the Non-Asset Builder path (max 20 chars)."
+    tnhiq_onboarding_group_specialized_contract_builder: "Group for the Specialized / Contract Builder path (max 20 chars)."
+    tnhiq_onboarding_group_vendor_partner: "Group for the Vendor / Partner path (max 20 chars)."

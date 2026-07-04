@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="csrf-token" content="<%= form_authenticity_token %>" />
+  <title>Your Assessment — Truck N' Hustle Founder's Circle</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0f1e; color: #e8ecf3; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 32px 16px; }
+    .wrap { width: 100%; max-width: 620px; }
+    .bar { height: 8px; background: #1c2540; border-radius: 999px; overflow: hidden; }
+    .bar > div { height: 100%; width: 0; background: #F2142F; transition: width .25s ease; }
+    .step-label { color: #8b97b4; font-size: 13px; margin: 10px 0 18px; }
+    .card { background: #111827; border: 1px solid #223; border-radius: 14px; padding: 28px; }
+    h2 { font-size: 22px; margin-bottom: 6px; }
+    .hint { color: #8b97b4; font-size: 14px; margin-bottom: 18px; }
+    .choice { display: block; width: 100%; text-align: left; padding: 14px 16px; margin-bottom: 10px; background: #0e1526; border: 1px solid #26304d; border-radius: 10px; color: #e8ecf3; font-size: 15px; cursor: pointer; transition: border-color .15s, background .15s; }
+    .choice:hover { border-color: #4a5madd; }
+    .choice.sel { border-color: #F2142F; background: rgba(242,20,47,.09); }
+    textarea { width: 100%; min-height: 110px; background: #0e1526; border: 1px solid #26304d; border-radius: 10px; color: #e8ecf3; font-size: 15px; padding: 12px 14px; resize: vertical; }
+    label.f { display: block; font-size: 13px; color: #b7c0d6; margin: 14px 0 6px; }
+    input.f { width: 100%; background: #0e1526; border: 1px solid #26304d; border-radius: 10px; color: #e8ecf3; font-size: 15px; padding: 10px 14px; }
+    .err { display: none; background: rgba(242,20,47,.12); border: 1px solid #F2142F; color: #ff8f9c; padding: 10px 14px; border-radius: 8px; margin-top: 12px; font-size: 14px; }
+    .nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 22px; }
+    button.btn { padding: 12px 22px; border-radius: 999px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; }
+    .btn-red { background: #F2142F; color: #fff; }
+    .btn-ghost { background: transparent; color: #b7c0d6; border: 1px solid #26304d; }
+    .btn:disabled { opacity: .6; cursor: default; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="bar"><div id="fill"></div></div>
+    <div class="step-label" id="steplabel"></div>
+    <div class="card">
+      <h2 id="qlabel"></h2>
+      <p class="hint" id="qhint"></p>
+      <div id="opts"></div>
+      <div class="err" id="err"></div>
+      <div class="nav">
+        <button class="btn btn-ghost" id="back" style="display:none;">Back</button>
+        <button class="btn btn-red" id="next">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var CSRF = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var QUESTIONS = [
+      { key: 'stage', type: 'single', label: 'Where are you right now?', options: [
+        ['stage_exploring','Brand new / exploring'],['stage_driver_to_owner','Driver looking to become an owner'],
+        ['stage_owner_operator','Owner-operator'],['stage_small_fleet','Small fleet'],
+        ['stage_dispatch_broker_backoffice','Dispatcher / broker / back-office operator'],
+        ['stage_existing_business_expansion','Existing business owner expanding into transportation'],
+        ['stage_vendor','Vendor / service provider'],['stage_not_sure','Not sure'] ] },
+      { key: 'interests', type: 'multi', min: 1, max: 3, label: 'What are you most interested in?', hint: 'Choose up to 3.', options: [
+        ['interest_box_truck_final_mile','Box truck / final mile'],['interest_dump_truck_construction','Dump truck / construction hauling'],
+        ['interest_hot_shot','Hot shot'],['interest_freight_brokerage','Freight brokerage'],['interest_dispatching','Dispatching'],
+        ['interest_government_contracting','Government contracting'],['interest_ports_drayage_intermodal','Ports / drayage / intermodal'],
+        ['interest_towing','Towing'],['interest_truck_parking_yards','Truck parking / yards'],['interest_route_business','Route business'],
+        ['interest_small_fleet','Small fleet trucking'],['interest_compliance_backoffice_safety','Compliance / back office / safety'],
+        ['interest_not_sure','Not sure'] ] },
+      { key: 'pain_point', type: 'single', label: 'What is your biggest challenge right now?', options: [
+        ['pain_choose_business','Choosing the right business'],['pain_understand_numbers','Understanding the numbers'],
+        ['pain_customers_contracts','Finding customers / contracts'],['pain_financing_equipment','Financing / equipment'],
+        ['pain_insurance_compliance','Insurance / compliance'],['pain_better_freight','Finding better freight'],
+        ['pain_operations_systems','Operations / dispatch / systems'],['pain_hiring_team','Hiring / team-building'],
+        ['pain_scaling','Scaling'],['pain_overwhelmed_direction','Overwhelmed and need direction'] ] },
+      { key: 'resources', type: 'multi', min: 1, max: 3, label: 'What resources are you working with?', hint: 'Choose up to 3 (one dollar range).', options: [
+        ['capital_under_1000','Less than $1,000'],['capital_1000_5000','$1,000–$5,000'],['capital_5000_10000','$5,000–$10,000'],
+        ['capital_10000_25000','$10,000–$25,000'],['capital_25000_50000','$25,000–$50,000'],['capital_50000_plus','$50,000+'],
+        ['resource_has_equipment','I have equipment'],['resource_has_credit_financing','I have credit / financing'],
+        ['resource_has_relationships','I have relationships'],['resource_time_limited_money','I have time but limited money'],
+        ['resource_money_limited_time','I have money but limited time'] ] },
+      { key: 'goal_90_day', type: 'text', label: 'What is your 90-day goal?', placeholder: 'Example: Choose the right business model, get my authority active, find my first customer, fix my numbers, hire a driver, or stabilize my current operation.' },
+      { key: 'help_wanted', type: 'multi', min: 1, max: 3, label: 'What kind of help do you want most?', hint: 'Choose up to 3.', options: [
+        ['help_peer_support','Community / peer support'],['help_case_studies','Case studies'],['help_templates_worksheets','Templates / worksheets'],
+        ['help_live_calls','Live calls'],['help_coaching_accountability','Coaching / accountability'],['help_vendor_recommendations','Vendor recommendations'],
+        ['help_business_opportunities','Business opportunities'],['help_choose_lane','Help choosing a lane'],['help_fix_current_business','Help fixing my current business'] ] }
+    ];
+    var CAPITAL = QUESTIONS[3].options.filter(function(o){return o[0].indexOf('capital_')===0;}).map(function(o){return o[0];});
+    var ans = { stage:'', interests:[], pain_point:'', resources:[], goal_90_day:'', help_wanted:[] };
+    var step = 0;
+    var el = function(id){ return document.getElementById(id); };
+
+    function render() {
+      var q = QUESTIONS[step];
+      el('fill').style.width = Math.round((step/QUESTIONS.length)*100)+'%';
+      el('steplabel').textContent = 'Question '+(step+1)+' of '+QUESTIONS.length;
+      el('qlabel').textContent = q.label;
+      el('qhint').textContent = q.hint || '';
+      el('qhint').style.display = q.hint ? 'block' : 'none';
+      el('err').style.display = 'none';
+      el('back').style.display = step === 0 ? 'none' : 'inline-block';
+      el('next').textContent = step === QUESTIONS.length-1 ? 'See My Path' : 'Next';
+      var box = el('opts'); box.replaceChildren();
+      if (q.type === 'text') { renderText(q, box); } else { renderChoices(q, box); }
+    }
+    function renderChoices(q, box) {
+      q.options.forEach(function(o){
+        var v=o[0], t=o[1];
+        var sel = q.type === 'single' ? ans[q.key]===v : ans[q.key].indexOf(v)!==-1;
+        var b = document.createElement('button');
+        b.type='button'; b.className='choice'+(sel?' sel':''); b.textContent=t;
+        b.addEventListener('click', function(){
+          if (q.type==='single') { ans[q.key]=v; }
+          else { var arr=ans[q.key], i=arr.indexOf(v);
+            if (i!==-1) arr.splice(i,1); else if (arr.length < q.max) arr.push(v); }
+          render();
+        });
+        box.appendChild(b);
+      });
+    }
+    function renderText(q, box) {
+      var ta=document.createElement('textarea'); ta.placeholder=q.placeholder||''; ta.maxLength=750; ta.value=ans.goal_90_day;
+      ta.addEventListener('input', function(){ ans.goal_90_day=ta.value; });
+      box.appendChild(ta);
+    }
+    function validate() {
+      var q = QUESTIONS[step];
+      if (q.type==='single' && !ans[q.key]) return 'Please choose an option.';
+      if (q.type==='multi') {
+        var a=ans[q.key];
+        if (a.length < q.min) return 'Please choose at least '+q.min+'.';
+        if (q.key==='interests' && a.indexOf('interest_not_sure')!==-1 && a.length>2) return "When 'Not sure' is selected, choose at most one other.";
+        if (q.key==='resources' && a.filter(function(v){return CAPITAL.indexOf(v)!==-1;}).length>1) return 'Select only one dollar range.';
+      }
+      if (q.type==='text') { var g=(ans.goal_90_day||'').trim(); if (g.length<20) return 'Please write at least 20 characters.'; if (g.length>750) return 'Please keep it under 750 characters.'; }
+      return null;
+    }
+    el('back').addEventListener('click', function(){ if (step>0){ step--; render(); } });
+    el('next').addEventListener('click', async function(){
+      var e = validate();
+      if (e) { el('err').textContent=e; el('err').style.display='block'; return; }
+      if (step < QUESTIONS.length-1) { step++; render(); return; }
+      el('next').disabled=true; el('next').textContent='Submitting…';
+      try {
+        var res = await fetch('/founders/onboarding/submit', {
+          method:'POST',
+          headers: { 'Content-Type':'application/json', 'X-CSRF-Token': CSRF },
+          body: JSON.stringify(ans)
+        });
+        var data = await res.json();
+        if (res.ok && data.ok) { window.location.href = data.redirect_url || '/founders/onboarding/result'; }
+        else { throw new Error((data.errors && data.errors[0]) || 'Submission failed.'); }
+      } catch (err) {
+        el('err').textContent = String(err.message || 'Something went wrong. Please try again.');
+        el('err').style.display='block'; el('next').disabled=false; el('next').textContent='See My Path';
+      }
+    });
+    render();
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+plugins:
+  tnhiq_onboarding_enabled:
+    default: false
+    client: true
+  # Members of this group are prompted to complete onboarding on first login.
+  tnhiq_onboarding_founding_group:
+    default: "founding_member"
+    client: true
+  # If true, incomplete members are redirected into onboarding; if false, it's skippable.
+  tnhiq_onboarding_required:
+    default: true
+    client: true
+  # Whether to add the member to their assigned path group on submission.
+  tnhiq_onboarding_assign_path_groups:
+    default: true
+    client: false
+  # Destinations shown on the result page (relative paths or full URLs).
+  tnhiq_onboarding_intro_topic_url:
+    default: "/c/introductions"
+    client: false
+  tnhiq_onboarding_roundtable_topic_url:
+    default: "/c/founding-members-roundtable"
+    client: false
+  tnhiq_onboarding_start_here_url:
+    default: "/c/start-here"
+    client: false
+  # Path -> Discourse group name (defaults match the provisioned groups; keep each <= 20 chars).
+  tnhiq_onboarding_group_beginner_explorer:
+    default: "beginner_explorer"
+    client: false
+  tnhiq_onboarding_group_driver_owner_operator:
+    default: "driver_owner"
+    client: false
+  tnhiq_onboarding_group_small_fleet_builder:
+    default: "small_fleet_builder"
+    client: false
+  tnhiq_onboarding_group_non_asset_builder:
+    default: "non_asset_builder"
+    client: false
+  tnhiq_onboarding_group_specialized_contract_builder:
+    default: "specialized_builder"
+    client: false
+  tnhiq_onboarding_group_vendor_partner:
+    default: "vendor_partner"
+    client: false
