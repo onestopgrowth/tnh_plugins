@@ -1,6 +1,10 @@
 plugins:
+  # Superseded by the Founder's Circle onboarding in the app + backend
+  # (Astro /onboarding/* + NestJS onboarding module). Disabled by default so
+  # its 3-step niche form and "redirect to /onboarding" gate do not compete
+  # with the new flow. Re-enable only if reverting to the in-forum onboarding.
   tnhiq_niche_onboarding_enabled:
-    default: true
+    default: false
     client: true
   tnhiq_niche_onboarding_crm_url:
     default: "https://tnh-comm-api.onrender.com"

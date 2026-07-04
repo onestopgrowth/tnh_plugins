@@ -21,6 +21,13 @@ export default {
 
   initialize() {
     withPluginApi("1.13.0", (api) => {
+      // Superseded by the Founder's Circle onboarding (app + backend). Do not
+      // redirect into the in-forum /onboarding flow unless explicitly enabled.
+      const siteSettings = api.container.lookup("service:site-settings");
+      if (!siteSettings || !siteSettings.tnhiq_niche_onboarding_enabled) {
+        return;
+      }
+
       const user = api.getCurrentUser();
       if (!user) {
         return;
